@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - 3307:3306
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - fastflow-net
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - 8086:80
+    depends_on:
+      - db
+    networks:
+      - fastflow-net
+
+  web:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - 9000:80
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      - fastflow-net
+
+volumes:
+  db-data:
+
+networks:
+  fastflow-net:
