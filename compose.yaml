@@ -9,8 +9,10 @@ services:
       - 3307:3306
     volumes:
       - db-data:/var/lib/mysql
+      # Les fichiers .sql de ce dossier sont exécutés au PREMIER démarrage (base vide)
+      - ./sql:/docker-entrypoint-initdb.d:ro
     networks:
-      - fastflow-net
+      - taskflow-net
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -23,7 +25,7 @@ services:
     depends_on:
       - db
     networks:
-      - fastflow-net
+      - taskflow-net
 
   web:
     build: .
@@ -40,10 +42,10 @@ services:
     depends_on:
       - db
     networks:
-      - fastflow-net
+      - taskflow-net
 
 volumes:
   db-data:
 
 networks:
-  fastflow-net:
+  taskflow-net:
